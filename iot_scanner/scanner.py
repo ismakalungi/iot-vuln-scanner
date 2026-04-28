@@ -1,0 +1,117 @@
+import os
+import asyncio
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from .logger import iot_logger
+from .config import SCAN_IP_RANGE, COMMON_IOT_PORTS, DEFAULT_CREDS_WORDLIST
+from .discovery import arp_scan
+from .port_scan import tcp_connect_scan
+from .checks import  check_ssh_default_creds, check_http_default_creds
+
+class IoTDeviceScanner:
+    """
+    Scans a network for IoT devices, open ports, and default credentials.
+    """
+    def __init__(self, ip_range: str = SCAN_IP_RANGE, ports: list[int] = COMMON_IOT_PORTS, wordlist_path: str = DEFAULT_CREDS_WORDLIST, threads: int = 20):
+        self.ip_range = ip_range
+        self.ports = ports
+        self.wordlist_path = wordlist_path
+        self.threads = threads
+        self.findings = {
+            "active_hosts": [],
+            "open_ports": [],
+            "vulnerable_creds": []
+        }
+        self.default_creds = self._load_default_creds()
+        iot_logger.info(f"[*] IoT Device Scanner initialized for IP range: {self.ip_range}")
+        iot_logger.info(f"[*] Scanning ports: {self.ports}")
+        iot_logger.info(f"[*] Loaded {len(self.default_creds)} default credential pairs.")
+
+    def _load_default_creds(self) -> list[tuple[str, str]]:
+        """
+        Loads default username:password pairs from a wordlist file.
+        """
+        creds = []
+        if not os.path.exists(self.wordlist_path):
+            iot_logger.warning(f"[WARN] Default credentials wordlist not found at {self.wordlist_path}. Skipping credential checks.")
+            return creds
+        try:
+            with open(self.wordlist_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if ':' in line:
+                        username, password = line.split(':', 1)
+                        creds.append((username, password))
+                    elif line: # If only username is provided, try with empty password
+                        creds.append((line, ""))
+            return creds
+        except Exception as e:
+            iot_logger.error(f"[ERROR] Failed to load default credentials from {self.wordlist_path}: {e}")
+            return []
+
+    def _check_host(self, host: str):
+        """
+        Scans a single host for open ports and default credentials.
+        """
+        iot_logger.info(f"[*] Scanning host: {host}")
+        host_open_ports = []
+        host_vulnerable_creds = []
+
+        with ThreadPoolExecutor(max_workers=self.threads) as executor:
+            port_scan_futures = {executor.submit(tcp_connect_scan, host, port): port for port in self.ports}
+            for future in as_completed(port_scan_futures):
+                port = port_scan_futures[future]
+                try:
+                    status, banner = future.result()
+                    if status == "open":
+                        host_open_ports.append({'port': port, 'banner': banner})
+                        iot_logger.info(f"[OPEN] {host}:{port}/TCP (Banner: {banner})")
+
+                        # Run credential checks for open ports
+                        for username, password in self.default_creds:
+                            if port == 23: # Telnet
+                                if asyncio.run(check_telnet_default_creds(host, port, username, password)):
+                                    host_vulnerable_creds.append({'host': host, 'port': port, 'service': 'Telnet', 'creds': f'{username}:{password}'})
+                            elif port == 22: # SSH
+                                if check_ssh_default_creds(host, port, username, password):
+                                    host_vulnerable_creds.append({'host': host, 'port': port, 'service': 'SSH', 'creds': f'{username}:{password}'})
+                            elif port in [80, 443, 8080, 8443, 8888]: # HTTP/HTTPS
+                                if check_http_default_creds(host, port, username, password):
+                                    host_vulnerable_creds.append({'host': host, 'port': port, 'service': 'HTTP/S', 'creds': f'{username}:{password}'})
+
+                except Exception as e:
+                    iot_logger.error(f"[ERROR] Port scan for {host}:{port} failed: {e}")
+        
+        if host_open_ports:
+            self.findings['open_ports'].append({'host': host, 'ports': host_open_ports})
+        if host_vulnerable_creds:
+            self.findings['vulnerable_creds'].extend(host_vulnerable_creds)
+
+    def run_scan(self):
+        """
+        Orchestrates the entire IoT device scanning process.
+        """
+        iot_logger.info("[*] Starting IoT device scan...")
+        try:
+            active_hosts = arp_scan(self.ip_range)
+            self.findings['active_hosts'] = active_hosts
+
+            if not active_hosts:
+                iot_logger.info("[*] No active hosts found in the specified IP range. Scan finished.")
+                return self.findings
+
+            with ThreadPoolExecutor(max_workers=self.threads) as executor:
+                futures = {executor.submit(self._check_host, host): host for host in active_hosts}
+                for future in as_completed(futures):
+                    host = futures[future]
+                    try:
+                        future.result()
+                    except Exception as e:
+                        iot_logger.error(f"[ERROR] Scan for host {host} failed: {e}")
+
+            iot_logger.info(f"[+] IoT device scan complete. Found {len(self.findings['open_ports'])} hosts with open ports and {len(self.findings['vulnerable_creds'])} default credential findings.")
+            return self.findings
+        except Exception as e:
+            iot_logger.critical(f"[CRITICAL] An error occurred during the IoT scan: {e}")
+            raise

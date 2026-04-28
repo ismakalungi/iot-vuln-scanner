@@ -1,0 +1,4 @@
+click
+scapy
+paramiko
+requests
