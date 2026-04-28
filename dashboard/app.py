@@ -2,7 +2,25 @@ from flask import Flask, render_template, request, flash
 import subprocess
 import json
 import os
-from dashboard.db import init_db, store_findings
+import sys
+
+# Ensure repo root is on sys.path so 'dashboard' package is importable when running as a script
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.abspath(os.path.join(THIS_DIR, '..'))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
+# Import DB helpers with fallback if running as a script directly
+try:
+    from dashboard.db import init_db, store_findings
+except Exception:
+    import importlib.util
+    db_path = os.path.join(REPO_ROOT, 'dashboard', 'db.py')
+    spec = importlib.util.spec_from_file_location('dashboard.db', db_path)
+    db = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(db)
+    init_db = db.init_db
+    store_findings = db.store_findings
 
 app = Flask(__name__)
 app.secret_key = 'secret-key'
