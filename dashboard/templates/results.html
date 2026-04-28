@@ -85,12 +85,14 @@
                 {% for scan in scans %}
                 <tr>
                   <td class="px-6 py-4">
-                    <a href="/scan/{{ scan['id'] }}" class="text-[#465fff] hover:underline font-medium">#{{ scan['id'] }}</a>
+                    <a href="/scan/{{ scan['id'] }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[#465fff] bg-[#ecf3ff] rounded-lg hover:bg-[#dde9ff]">
+                      View
+                    </a>
                   </td>
                   <td class="px-6 py-4">{{ scan['timestamp'] }}</td>
                   <td class="px-6 py-4">{{ scan['ip_range'] }}</td>
                   <td class="px-6 py-4">
-                    <span class="rounded-full px-2 py-1 text-xs font-medium {% if scan['status'] == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium {% if scan['status'] == 'success' %}bg-green-50 text-green-600{% else %}bg-red-50 text-red-600{% endif %}">
                       {{ scan['status'] }}
                     </span>
                   </td>
