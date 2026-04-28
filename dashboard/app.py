@@ -2,9 +2,11 @@ from flask import Flask, render_template, request, flash
 import subprocess
 import json
 import os
+from dashboard.db import init_db, store_findings
 
 app = Flask(__name__)
 app.secret_key = 'secret-key'
+init_db()
 
 @app.route('/')
 def index():
@@ -42,12 +44,16 @@ def scan():
                 f"{summary['vulnerable_creds']} potential default creds findings.",
                 'success'
             )
+            # Persist findings to the database
+            store_findings(findings, ip_range='172.20.44.0/24', status='success', summary_json=json.dumps(findings))
             return render_template('index.html', results=findings, results_json=json.dumps(findings, indent=2))
         else:
             flash("Scan failed: " + (result.stderr or result.stdout), 'danger')
+            store_findings(None, ip_range='172.20.44.0/24', status='failed', summary_json=json.dumps({'error': (result.stderr or result.stdout)}))
             return render_template('index.html')
     except Exception as e:
         flash(f"Error running scan: {str(e)}", 'danger')
+        store_findings(None, ip_range='172.20.44.0/24', status='failed', summary_json=json.dumps({'error': str(e)}))
         return render_template('index.html')
 
 if __name__ == '__main__':
