@@ -1,5 +1,7 @@
 # IoT Guardian Scanner
 
+<img src="dash.png" alt="IOT Vuln Dashboard">
+
 A vulnerability scanning tool for discovering and assessing IoT devices on local networks. Features a web dashboard for managing scans and viewing results.
 
 ## Features
