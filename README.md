@@ -64,6 +64,8 @@ python app.py
 
 Access at: http://localhost:5000
 
+<img src="log.png" alt="IOT Vuln Dashboard Login">
+
 Login credentials (set in .env):
 - Username: ismakalungi
 - Password: password
