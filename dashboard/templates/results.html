@@ -84,7 +84,9 @@
               <tbody class="divide-y divide-gray-200">
                 {% for scan in scans %}
                 <tr>
-                  <td class="px-6 py-4">{{ scan['id'] }}</td>
+                  <td class="px-6 py-4">
+                    <a href="/scan/{{ scan['id'] }}" class="text-[#465fff] hover:underline font-medium">#{{ scan['id'] }}</a>
+                  </td>
                   <td class="px-6 py-4">{{ scan['timestamp'] }}</td>
                   <td class="px-6 py-4">{{ scan['ip_range'] }}</td>
                   <td class="px-6 py-4">

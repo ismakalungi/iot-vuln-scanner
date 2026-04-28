@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Scan {{ scan['id'] }} | IoT Guardian Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-gray-50 font-['Outfit']">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <aside class="fixed left-0 top-0 z-50 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5">
+        <div class="pt-8 pb-7">
+          <a href="/">
+            <span class="text-xl font-bold text-[#465fff]">IoT Guardian</span>
+          </a>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto">
+          <div>
+            <h3 class="mb-4 text-xs font-semibold uppercase text-gray-400">MENU</h3>
+            <ul class="flex flex-col gap-2">
+              <li>
+                <a href="/" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                  </svg>
+                  <span>Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a href="/scan" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                  </svg>
+                  <span>Scan Network</span>
+                </a>
+              </li>
+              <li>
+                <a href="/results" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-[#ecf3ff] text-[#465fff]">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                  </svg>
+                  <span>Results</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        
+        <div class="pb-4">
+          <a href="/logout" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17 7l-1.41 1.41L18.59 7 20 5.59 17 3 15.59 4.41 17 7zM7 7l-1.41-1.41L5.41 7 4 8.41l1.59 1.59L4 11.59 5.41 13 7 11.59 8.41 10 7 7zm0 14l1.41-1.41L8.59 19l1.59 1.59L7 21l1.41-1.41L7 17l1.59 1.59L7 21l1.41-1.41L7 17V7h10v10h-2l-1.59 1.59L7 17z"/>
+            </svg>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <div class="ml-[290px] flex flex-col flex-1">
+        <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+          <div class="flex items-center gap-4">
+            <a href="/results" class="text-gray-500 hover:text-gray-700">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 11H7.83l5.59-5.59L20 12l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+              </svg>
+            </a>
+            <h2 class="text-xl font-semibold text-gray-800">Scan #{{ scan['id'] }}</h2>
+          </div>
+          <span class="text-sm text-gray-600">{{ session.get('username', 'Admin') }}</span>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-6">
+          <!-- Scan Info -->
+          <div class="mb-6 grid grid-cols-3 gap-4">
+            <div class="rounded-lg border border-gray-200 bg-white p-5">
+              <p class="text-sm font-medium text-gray-500">IP Range</p>
+              <p class="mt-1 text-lg font-semibold text-gray-800">{{ scan['ip_range'] }}</p>
+            </div>
+            <div class="rounded-lg border border-gray-200 bg-white p-5">
+              <p class="text-sm font-medium text-gray-500">Timestamp</p>
+              <p class="mt-1 text-lg font-semibold text-gray-800">{{ scan['timestamp'] }}</p>
+            </div>
+            <div class="rounded-lg border border-gray-200 bg-white p-5">
+              <p class="text-sm font-medium text-gray-500">Status</p>
+              <p class="mt-1 text-lg font-semibold {% if scan['status'] == 'success' %}text-green-600{% else %}text-red-600{% endif %}">{{ scan['status'] }}</p>
+            </div>
+          </div>
+
+          <!-- Active Hosts -->
+          <div class="mb-6 rounded-lg border border-gray-200 bg-white">
+            <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-gray-800">Active Hosts ({{ hosts|length }})</h3>
+            </div>
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                <tr>
+                  <th class="px-6 py-3 text-left">Host</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {% for host in hosts %}
+                <tr>
+                  <td class="px-6 py-4 font-mono text-gray-700">{{ host['host'] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td class="px-6 py-4 text-gray-500">No hosts found</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Open Ports -->
+          <div class="mb-6 rounded-lg border border-gray-200 bg-white">
+            <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-gray-800">Open Ports ({{ ports|length }})</h3>
+            </div>
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                <tr>
+                  <th class="px-6 py-3 text-left">Host</th>
+                  <th class="px-6 py-3 text-left">Port</th>
+                  <th class="px-6 py-3 text-left">Banner</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {% for port in ports %}
+                <tr>
+                  <td class="px-6 py-4 font-mono text-gray-700">{{ port['host'] }}</td>
+                  <td class="px-6 py-4 text-gray-700">{{ port['port'] }}</td>
+                  <td class="px-6 py-4 text-gray-500 font-mono text-xs">{{ port['banner'] or 'N/A' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="3" class="px-6 py-4 text-gray-500">No ports found</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Vulnerable Credentials -->
+          <div class="rounded-lg border border-gray-200 bg-white">
+            <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-gray-800">Vulnerable Credentials ({{ creds|length }})</h3>
+            </div>
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                <tr>
+                  <th class="px-6 py-3 text-left">Host</th>
+                  <th class="px-6 py-3 text-left">Service</th>
+                  <th class="px-6 py-3 text-left">Port</th>
+                  <th class="px-6 py-3 text-left">Credentials</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {% for cred in creds %}
+                <tr>
+                  <td class="px-6 py-4 font-mono text-gray-700">{{ cred['host'] }}</td>
+                  <td class="px-6 py-4 text-gray-700">{{ cred['service'] }}</td>
+                  <td class="px-6 py-4 text-gray-700">{{ cred['port'] }}</td>
+                  <td class="px-6 py-4 font-mono text-red-600">{{ cred['creds'] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="4" class="px-6 py-4 text-gray-500">No vulnerable credentials found</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-6 flex gap-4">
+            <a href="/results" class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200">
+              Back to Results
+            </a>
+            <a href="/scan" class="inline-flex items-center gap-2 rounded-lg bg-[#465fff] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#3641f5]">
+              New Scan
+            </a>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

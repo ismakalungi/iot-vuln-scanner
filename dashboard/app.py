@@ -143,6 +143,33 @@ def results():
     
     return render_template('results.html', scans=scans)
 
+@app.route('/scan/<int:scan_id>')
+@login_required
+def scan_detail(scan_id):
+    conn = sqlite3.connect(DATABASE_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    
+    cur.execute("SELECT * FROM scans WHERE id = ?", (scan_id,))
+    scan = cur.fetchone()
+    
+    cur.execute("SELECT * FROM hosts WHERE scan_id = ?", (scan_id,))
+    hosts = cur.fetchall()
+    
+    cur.execute("SELECT * FROM ports WHERE scan_id = ?", (scan_id,))
+    ports = cur.fetchall()
+    
+    cur.execute("SELECT * FROM credentials WHERE scan_id = ?", (scan_id,))
+    creds = cur.fetchall()
+    
+    conn.close()
+    
+    if not scan:
+        flash('Scan not found', 'danger')
+        return redirect(url_for('results'))
+    
+    return render_template('scan_detail.html', scan=scan, hosts=hosts, ports=ports, creds=creds)
+
 @app.route('/api/scan-status')
 @login_required
 def scan_status():
