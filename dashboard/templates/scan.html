@@ -6,103 +6,160 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>Scan Network | IoT Guardian Scanner</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Outfit', sans-serif; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .animate-spin { animation: spin 1s linear infinite; }
+    .menu-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem; border-radius: 0.5rem; transition: all 0.2s; }
+    .menu-item-inactive { color: #374151; }
+    .menu-item-inactive:hover { background-color: #f3f4f6; }
+    .dark .menu-item-inactive { color: #d1d5db; }
+    .dark .menu-item-inactive:hover { background-color: #1f2937; }
+    .menu-item-active { background-color: #eff6ff; color: #2563eb; }
+    .dark .menu-item-active { background-color: rgba(30, 58, 138, 0.3); color: #60a5fa; }
+    .menu-item-text { flex: 1; }
+  </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
+<body
+  x-data="{ page: 'scan', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
+  :class="{'dark bg-gray-900': darkMode === true}"
+  class="bg-gray-50"
+>
+  <!-- Page Wrapper -->
   <div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h1 class="text-xl font-bold text-blue-600 dark:text-blue-400">IoT Guardian</h1>
-        <p class="text-xs text-gray-500 dark:text-gray-400">Vulnerability Scanner</p>
+    <aside
+      :class="sidebarToggle ? 'translate-x-0 lg:w-[90px]' : '-translate-x-full'"
+      class="sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5 dark:border-gray-800 dark:bg-black lg:static lg:translate-x-0"
+    >
+      <div class="flex items-center gap-2 pt-8 pb-7">
+        <a href="/">
+          <span class="logo" :class="sidebarToggle ? 'hidden' : ''">
+            <span class="text-xl font-bold text-blue-600">IoT Guardian</span>
+          </span>
+        </a>
       </div>
-      <nav class="flex-1 p-4">
-        <ul class="space-y-2">
-          <li>
-            <a href="/" class="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-              Dashboard
-            </a>
-          </li>
-          <li>
-            <a href="/scan" class="block px-4 py-2 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
-              Scan Network
-            </a>
-          </li>
-          <li>
-            <a href="/results" class="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-              Scan Results
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-        <a href="/logout" class="block px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900">
-          Logout
+
+      <div class="flex flex-col overflow-y-auto">
+        <nav x-data="{selected: 'Scan'}">
+          <div>
+            <h3 class="mb-4 text-xs uppercase leading-[20px] text-gray-400">MENU</h3>
+            <ul class="flex flex-col gap-4 mb-6">
+              <li>
+                <a href="/" class="menu-item group" :class="page === 'dashboard' ? 'menu-item-active' : 'menu-item-inactive'">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5ZM5.5 12.75C4.25736 12.75 3.25 13.7574 3.25 15V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H9C10.2426 20.75 11.25 19.7427 11.25 18.5V15C11.25 13.7574 10.2426 12.75 9 12.75H5.5ZM4.75 15C4.75 14.5858 5.08579 14.25 5.5 14.25H9C9.41421 14.25 9.75 14.5858 9.75 15V18.5C9.75 18.9142 9.41421 19.25 9 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V15ZM12.75 5.5C12.75 4.25736 13.7574 3.25 15 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V8.99998C20.75 10.2426 19.7426 11.25 18.5 11.25H15C13.7574 11.25 12.75 10.2426 12.75 8.99998V5.5ZM15 4.75C14.5858 4.75 14.25 5.08579 14.25 5.5V8.99998C14.25 9.41419 14.5858 9.74998 15 9.74998H18.5C18.9142 9.74998 19.25 9.41419 19.25 8.99998V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H15ZM15 12.75C13.7574 12.75 12.75 13.7574 12.75 15V18.5C12.75 19.7426 13.7574 20.75 15 20.75H18.5C19.7426 20.75 20.75 19.7427 20.75 18.5V15C20.75 13.7574 19.7426 12.75 18.5 12.75H15ZM14.25 15C14.25 14.5858 14.5858 14.25 15 14.25H18.5C18.9142 14.25 19.25 14.5858 19.25 15V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15C14.5858 19.25 14.25 18.9142 14.25 18.5V15Z" fill="currentColor"/>
+                  </svg>
+                  <span class="menu-item-text">Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a href="/scan" class="menu-item group" :class="page === 'scan' ? 'menu-item-active' : 'menu-item-inactive'">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9 3.5C9 3.5 9 3.5 9 3.5H15C15 3.5 15 3.5 15 3.5V7C15 7 15 7 15 7H20.75C20.336 7 20 7.33579 20 7.75C20 8.16421 20.336 8.5 20.75 8.5H21C21 8.5 21 8.5 21 8.5V14C21 14 21 14 21 14C21 14.4142 20.6642 14.75 20.25 14.75C19.8358 14.75 19.5 14.4142 19.5 14V8.5L19.5 3.5H9V3.5ZM8.5 8.5H3.25C3.25 8.5 3.25 8.5 3.25 8.5C3.25 8.91421 3.58579 9.25 4 9.25C4.41421 9.25 4.75 8.91421 4.75 8.5V8.5C4.75 8.5 4.75 8.5 4.75 8.5L4.75 14C4.75 14.4142 5.08579 14.75 5.5 14.75C5.91421 14.75 6.25 14.4142 6.25 14V9.5L8.5 7.25V8.5ZM15 8.5H9.5L15 14V8.5ZM15 14.75H20.25L15 9.5V14.75Z" fill="currentColor"/>
+                  </svg>
+                  <span class="menu-item-text">Scan Network</span>
+                </a>
+              </li>
+              <li>
+                <a href="/results" class="menu-item group" :class="page === 'results' ? 'menu-item-active' : 'menu-item-inactive'">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M3.25 5.5C3.25 4.25736 4.25736 3.25 5.5 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V18.5C20.75 19.7426 19.7426 20.75 18.5 20.75H5.5C4.25736 20.75 3.25 19.7426 3.25 18.5V5.5ZM5.5 4.75C5.08579 4.75 4.75 5.08579 4.75 5.5V8.58325L19.25 8.58325V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H5.5ZM19.25 10.0833H15.416V13.9165H19.25V10.0833ZM13.916 10.0833L10.083 10.0833V13.9165L13.916 13.9165V10.0833ZM8.58301 10.0833H4.75V13.9165H8.58301V10.0833ZM4.75 18.5V15.4165H8.58301V19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5ZM10.083 19.25V15.4165L13.916 15.4165V19.25H10.083ZM15.416 19.25V15.4165H19.25V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15.416Z" fill="currentColor"/>
+                  </svg>
+                  <span class="menu-item-text">Scan Results</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <div class="pb-4">
+        <a href="/logout" class="flex items-center gap-3 px-4 py-3 text-sm font-normal text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 3.5C9 3.5 9 3.5 9 3.5H15C15 3.5 15 3.5 15 3.5V7C15 7 15 7 15 7H20.75C20.336 7 20 7.33579 20 7.75C20 8.16421 20.336 8.5 20.75 8.5H21C21 8.5 21 8.5 21 8.5V14C21 14 21 14 21 14C21 14.4142 20.6642 14.75 20.25 14.75C19.8358 14.75 19.5 14.4142 19.5 14V8.5L19.5 3.5H9V3.5ZM8.5 8.5H3.25C3.25 8.5 3.25 8.5 3.25 8.5C3.25 8.91421 3.58579 9.25 4 9.25C4.41421 9.25 4.75 8.91421 4.75 8.5V8.5C4.75 8.5 4.75 8.5 4.75 8.5L4.75 14C4.75 14.4142 5.08579 14.75 5.5 14.75C5.91421 14.75 6.25 14.4142 6.25 14V9.5L8.5 7.25V8.5ZM15 8.5H9.5L15 14V8.5ZM15 14.75H20.25L15 9.5V14.75Z" fill="currentColor"/>
+          </svg>
+          <span>Logout</span>
         </a>
       </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Content Area -->
+    <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
       <!-- Header -->
-      <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Scan Network</h2>
-        <div class="flex items-center space-x-4">
-          <span class="text-sm text-gray-600 dark:text-gray-400">Welcome, {{ session.get('username', 'Admin') }}</span>
+      <header class="sticky top-0 z-99999 flex w-full border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <div class="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">
+          <div class="flex w-full items-center justify-between gap-2 px-3 py-3 lg:justify-normal lg:px-0 lg:py-4">
+            <button @click.stop="sidebarToggle = !sidebarToggle" class="z-99999 flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 lg:h-11 lg:w-11 dark:border-gray-800 dark:text-gray-400">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M3.25 6C3.25 5.58579 3.58579 5.25 4 5.25L20 5.25C20.4142 5.25 20.75 5.58579 20.75 6C20.75 6.41421 20.4142 6.75 20 6.75L4 6.75C3.58579 6.75 3.25 6.41422 3.25 6ZM3.25 18C3.25 17.5858 3.58579 17.25 4 17.25L20 17.25C20.4142 17.25 20.75 17.5858 20.75 18C20.75 18.4142 20.4142 18.75 20 18.75L4 18.75C3.58579 18.75 3.25 18.4142 3.25 18ZM4 11.25C3.58579 11.25 3.25 11.5858 3.25 12C3.25 12.4142 3.58579 12.75 4 12.75L12 12.75C12.4142 12.75 12.75 12.4142 12.75 12C12.75 11.5858 12.4142 11.25 12 11.25L4 11.25Z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center gap-4 px-4">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Welcome, {{ session.get('username', 'Admin') }}</span>
+          </div>
         </div>
       </header>
 
-      <!-- Main Content Area -->
-      <main class="flex-1 overflow-y-auto p-6">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="mb-4">
-            {% for category, message in messages %}
-              <div class="p-3 rounded-lg mb-2 {% if category == 'danger' %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200{% elif category == 'success' %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200{% else %}bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200{% endif %}">
-                {{ message }}
+      <!-- Main Content -->
+      <main>
+        <div class="p-4 mx-auto md:p-6">
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="mb-4">
+              {% for category, message in messages %}
+                <div class="mb-2 rounded-lg p-3 {% if category == 'danger' %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200{% elif category == 'success' %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200{% else %}bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200{% endif %}">
+                  {{ message }}
+                </div>
+              {% endfor %}
               </div>
-            {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+            {% endif %}
+          {% endwith %}
 
-        <!-- Scan Form -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Configure Scan</h3>
-          <form id="scanForm" method="POST" action="/scan">
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                IP Range
-              </label>
-              <input type="text" name="ip_range" value="172.20.44.0/24" 
-                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" />
-              <p class="text-xs text-gray-500 mt-1">Enter the network range to scan (e.g., 192.168.1.0/24)</p>
-            </div>
-            <button type="submit" id="scanBtn"
-              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
-              Start Scan
-            </button>
-          </form>
-        </div>
+          <!-- Scan Form -->
+          <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 mb-6">
+            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">Configure Scan</h3>
+            <form id="scanForm" method="POST" action="/scan">
+              <div class="mb-4">
+                <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  IP Range
+                </label>
+                <input type="text" name="ip_range" value="172.20.44.0/24"
+                  class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/10" />
+                <p class="mt-1 text-xs text-gray-500">Enter the network range to scan (e.g., 192.168.1.0/24)</p>
+              </div>
+              <button type="submit" id="scanBtn"
+                class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700">
+                Start Scan
+              </button>
+            </form>
+          </div>
 
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <div class="flex items-center justify-center">
-            <div class="text-center">
-              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p class="text-gray-700 dark:text-gray-300">Scanning network... This may take a few minutes.</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Do not refresh the page</p>
+          <!-- Loading Indicator -->
+          <div id="loadingIndicator" class="hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 mb-6">
+            <div class="flex items-center justify-center">
+              <div class="text-center">
+                <svg class="mx-auto mb-4 h-12 w-12 animate-spin text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="text-gray-700 dark:text-gray-300">Scanning network... This may take several minutes.</p>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Do not refresh the page</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Scan Results -->
-        {% if results %}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Scan Results</h3>
-          <pre class="text-sm text-gray-600 dark:text-gray-400 overflow-x-auto">{{ results_json }}</pre>
+          <!-- Scan Results -->
+          {% if results %}
+          <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">Scan Results</h3>
+            <pre class="overflow-x-auto text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{{ results_json }}</pre>
+          </div>
+          {% endif %}
         </div>
-        {% endif %}
       </main>
     </div>
   </div>
@@ -111,7 +168,7 @@
     document.getElementById('scanForm').addEventListener('submit', function() {
       document.getElementById('loadingIndicator').classList.remove('hidden');
       document.getElementById('scanBtn').disabled = true;
-      document.getElementById('scanBtn').classList.add('opacity-50');
+      document.getElementById('scanBtn').classList.add('opacity-50', 'cursor-not-allowed');
     });
   </script>
 </body>
