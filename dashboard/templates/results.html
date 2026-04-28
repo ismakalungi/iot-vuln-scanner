@@ -9,105 +9,101 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body class="bg-gray-50 font-['Outfit']">
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex min-h-screen">
       <!-- Sidebar -->
-      <aside class="fixed left-0 top-0 z-50 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5">
-        <div class="pt-8 pb-7">
-          <a href="/">
-            <span class="text-xl font-bold text-[#465fff]">IoT Guardian</span>
-          </a>
+      <aside class="fixed left-0 top-0 z-50 hidden h-screen w-[260px] flex-col overflow-y-hidden border-r border-gray-200 bg-white lg:flex">
+        <div class="pt-8 pb-6 px-5">
+          <a href="/"><span class="text-xl font-bold text-[#465fff]">IoT Guardian</span></a>
         </div>
-        
-        <nav class="flex-1 overflow-y-auto">
+        <nav class="flex-1 overflow-y-auto px-5">
           <div>
-            <h3 class="mb-4 text-xs font-semibold uppercase text-gray-400">MENU</h3>
-            <ul class="flex flex-col gap-2">
+            <h3 class="mb-3 text-xs font-semibold uppercase text-gray-400">Menu</h3>
+            <ul class="flex flex-col gap-1">
               <li>
-                <a href="/" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-                  </svg>
+                <a href="/" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
                   <span>Dashboard</span>
                 </a>
               </li>
               <li>
-                <a href="/scan" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                  </svg>
+                <a href="/scan" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                   <span>Scan Network</span>
                 </a>
               </li>
               <li>
                 <a href="/results" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-[#ecf3ff] text-[#465fff]">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                  </svg>
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
                   <span>Results</span>
                 </a>
               </li>
             </ul>
           </div>
         </nav>
-        
-        <div class="pb-4">
+        <div class="px-5 pb-6">
           <a href="/logout" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17 7l-1.41 1.41L18.59 7 20 5.59 17 3 15.59 4.41 17 7zM7 7l-1.41-1.41L5.41 7 4 8.41l1.59 1.59L4 11.59 5.41 13 7 11.59 8.41 10 7 7zm0 14l1.41-1.41L8.59 19l1.59 1.59L7 21l1.41-1.41L7 17l1.59 1.59L7 21l1.41-1.41L7 17V7h10v10h-2l-1.59 1.59L7 17z"/>
-            </svg>
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.59 7 20 5.59 17 3 15.59 4.41 17 7zM7 7l-1.41-1.41L5.41 7 4 8.41l1.59 1.59L4 11.59 5.41 13 7 11.59 8.41 10 7 7z"/></svg>
             <span>Logout</span>
           </a>
         </div>
       </aside>
 
-      <!-- Main -->
-      <div class="ml-[290px] flex flex-col flex-1">
-        <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <div class="flex-1 lg:pl-[260px]">
+        <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 lg:hidden">
+          <span class="text-lg font-bold text-[#465fff]">IoT Guardian</span>
+          <a href="/logout" class="text-red-600 text-sm">Logout</a>
+        </header>
+        <header class="hidden lg:flex lg:h-16 lg:items-center lg:justify-between lg:border-b lg:border-gray-200 lg:bg-white lg:px-6">
           <h2 class="text-xl font-semibold text-gray-800">Scan Results</h2>
-          <span class="text-sm text-gray-600">Welcome, {{ session.get('username', 'Admin') }}</span>
+          <span class="text-sm text-gray-500">{{ session.get('username', 'Admin') }}</span>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-6">
-          <div class="rounded-lg border border-gray-200 bg-white">
-            <div class="border-b border-gray-200 px-6 py-4">
+        <main class="p-4 md:p-6">
+          <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+            <div class="border-b border-gray-200 px-4 py-4 sm:px-6">
               <h3 class="text-lg font-semibold text-gray-800">All Scan Results</h3>
             </div>
-            <table class="w-full text-sm">
-              <thead class="bg-gray-50 text-xs uppercase text-gray-500">
-                <tr>
-                  <th class="px-6 py-3 text-left">ID</th>
-                  <th class="px-6 py-3 text-left">Timestamp</th>
-                  <th class="px-6 py-3 text-left">IP Range</th>
-                  <th class="px-6 py-3 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200">
-                {% for scan in scans %}
-                <tr>
-                  <td class="px-6 py-4">
-                    <a href="/scan/{{ scan['id'] }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[#465fff] bg-[#ecf3ff] rounded-lg hover:bg-[#dde9ff]">
-                      View
-                    </a>
-                  </td>
-                  <td class="px-6 py-4">{{ scan['timestamp'] }}</td>
-                  <td class="px-6 py-4">{{ scan['ip_range'] }}</td>
-                  <td class="px-6 py-4">
-                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium {% if scan['status'] == 'success' %}bg-green-50 text-green-600{% else %}bg-red-50 text-red-600{% endif %}">
-                      {{ scan['status'] }}
-                    </span>
-                  </td>
-                </tr>
-                {% else %}
-                <tr>
-                  <td colspan="4" class="px-6 py-8 text-center text-gray-500">No scan results yet.</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                  <tr>
+                    <th class="px-4 py-3 text-left">ID</th>
+                    <th class="px-4 py-3 text-left">Timestamp</th>
+                    <th class="px-4 py-3 text-left">IP Range</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-left">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  {% for scan in scans %}
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium text-gray-800">#{{ scan['id'] }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ scan['timestamp'] }}</td>
+                    <td class="px-4 py-3 font-mono text-gray-600">{{ scan['ip_range'] }}</td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {% if scan['status'] == 'success' %}bg-green-50 text-green-600{% else %}bg-red-50 text-red-600{% endif %}">
+                        {{ scan['status'] }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <a href="/scan/{{ scan['id'] }}" class="inline-flex items-center gap-1.5 rounded-lg bg-[#ecf3ff] px-3 py-1.5 text-xs font-medium text-[#465fff] hover:bg-[#dde9ff]">
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">No scan results yet.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <div class="mt-6">
-            <a href="/scan" class="inline-flex items-center gap-2 rounded-lg bg-[#465fff] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#3641f5]">
+          <div class="mt-6 flex justify-center">
+            <a href="/scan" class="inline-flex items-center gap-2 rounded-lg bg-[#465fff] px-6 py-3 text-sm font-medium text-white hover:bg-[#3641f5]">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
               Start New Scan
             </a>
           </div>
