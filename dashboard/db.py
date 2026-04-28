@@ -1,12 +1,13 @@
 import sqlite3
 import json
 import os
+import sys
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'db.sqlite')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import DATABASE_PATH
 
 def _get_connection():
-    # Each operation uses a fresh connection; keeps things simple and safe for a small app
-    return sqlite3.connect(DB_PATH)
+    return sqlite3.connect(DATABASE_PATH)
 
 def init_db():
     conn = _get_connection()

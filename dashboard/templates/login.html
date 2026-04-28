@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Sign In | IoT Guardian Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+  <div class="relative flex flex-col justify-center w-full h-screen">
+    <div class="flex flex-col flex-1 w-full lg:w-1/2 mx-auto">
+      <div class="w-full max-w-md pt-10 mx-auto">
+        <a href="/" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">
+          Back to dashboard
+        </a>
+      </div>
+      <div class="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
+        <div>
+          <div class="mb-5 sm:mb-8">
+            <h1 class="mb-2 font-semibold text-gray-800 text-2xl dark:text-white">Sign In</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Enter your credentials to access the IoT Scanner Dashboard
+            </p>
+          </div>
+          <div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="mb-4">
+                {% for category, message in messages %}
+                  <div class="p-3 rounded-lg mb-2 {% if category == 'danger' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-700{% endif %}">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+            <form method="POST" action="/login">
+              <div class="space-y-5">
+                <div>
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Username<span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" id="username" name="username" placeholder="Enter your username" required
+                    class="dark:bg-gray-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:text-white/90" />
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Password<span class="text-red-500">*</span>
+                  </label>
+                  <input type="password" id="password" name="password" placeholder="Enter your password" required
+                    class="dark:bg-gray-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:text-white/90" />
+                </div>
+                <div class="flex items-center justify-between">
+                  <label class="flex items-center text-sm font-normal text-gray-700 cursor-pointer dark:text-gray-400">
+                    <input type="checkbox" class="mr-3" />
+                    Keep me logged in
+                  </label>
+                </div>
+                <div>
+                  <button type="submit"
+                    class="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-blue-600 hover:bg-blue-700">
+                    Sign In
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

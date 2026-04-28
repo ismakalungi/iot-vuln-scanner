@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Scan Network | IoT Guardian Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <h1 class="text-xl font-bold text-blue-600 dark:text-blue-400">IoT Guardian</h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Vulnerability Scanner</p>
+      </div>
+      <nav class="flex-1 p-4">
+        <ul class="space-y-2">
+          <li>
+            <a href="/" class="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/scan" class="block px-4 py-2 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+              Scan Network
+            </a>
+          </li>
+          <li>
+            <a href="/results" class="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              Scan Results
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+        <a href="/logout" class="block px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900">
+          Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Scan Network</h2>
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Welcome, {{ session.get('username', 'Admin') }}</span>
+        </div>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 overflow-y-auto p-6">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="mb-4">
+            {% for category, message in messages %}
+              <div class="p-3 rounded-lg mb-2 {% if category == 'danger' %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200{% elif category == 'success' %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200{% else %}bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Scan Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Configure Scan</h3>
+          <form id="scanForm" method="POST" action="/scan">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                IP Range
+              </label>
+              <input type="text" name="ip_range" value="172.20.44.0/24" 
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" />
+              <p class="text-xs text-gray-500 mt-1">Enter the network range to scan (e.g., 192.168.1.0/24)</p>
+            </div>
+            <button type="submit" id="scanBtn"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+              Start Scan
+            </button>
+          </form>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+          <div class="flex items-center justify-center">
+            <div class="text-center">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p class="text-gray-700 dark:text-gray-300">Scanning network... This may take a few minutes.</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Do not refresh the page</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scan Results -->
+        {% if results %}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Scan Results</h3>
+          <pre class="text-sm text-gray-600 dark:text-gray-400 overflow-x-auto">{{ results_json }}</pre>
+        </div>
+        {% endif %}
+      </main>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('scanForm').addEventListener('submit', function() {
+      document.getElementById('loadingIndicator').classList.remove('hidden');
+      document.getElementById('scanBtn').disabled = true;
+      document.getElementById('scanBtn').classList.add('opacity-50');
+    });
+  </script>
+</body>
+</html>

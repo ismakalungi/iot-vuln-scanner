@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Scan Results | IoT Guardian Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <h1 class="text-xl font-bold text-blue-600 dark:text-blue-400">IoT Guardian</h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Vulnerability Scanner</p>
+      </div>
+      <nav class="flex-1 p-4">
+        <ul class="space-y-2">
+          <li>
+            <a href="/" class="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/scan" class="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              Scan Network
+            </a>
+          </li>
+          <li>
+            <a href="/results" class="block px-4 py-2 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+              Scan Results
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+        <a href="/logout" class="block px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900">
+          Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Scan Results</h2>
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Welcome, {{ session.get('username', 'Admin') }}</span>
+        </div>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 overflow-y-auto p-6">
+        <!-- Results Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">All Scan Results</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th class="px-6 py-3">ID</th>
+                  <th class="px-6 py-3">Timestamp</th>
+                  <th class="px-6 py-3">IP Range</th>
+                  <th class="px-6 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for scan in scans %}
+                <tr class="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+                  <td class="px-6 py-4">{{ scan['id'] }}</td>
+                  <td class="px-6 py-4">{{ scan['timestamp'] }}</td>
+                  <td class="px-6 py-4">{{ scan['ip_range'] }}</td>
+                  <td class="px-6 py-4">
+                    <span class="px-2 py-1 rounded text-xs {% if scan['status'] == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                      {{ scan['status'] }}
+                    </span>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="4" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">No scan results yet. Start a scan!</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <a href="/scan" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+            Start New Scan
+          </a>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
