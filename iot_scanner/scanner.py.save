@@ -111,53 +111,70 @@ class IoTDeviceScanner:
                         iot_logger.error(f"[ERROR] Scan for host {host} failed: {e}")
 
             iot_logger.info(f"[+] IoT device scan complete. Found {len(self.findings['open_ports'])} hosts with open ports and {len(self.findings['vulnerable_creds'])} default credential findings.")
+        # === Risk Scoring ===
+            risk_level, risk_score = self.calculate_risk_score(self.findings)
+            print (f"\n=== RISK ASSESSMENT ===")
+            print (f"Overall Risk Level : {risk_level}")
+            print (f"Risk Score         : {risk_score}")
+            print ("=======================\n")
+        # ====================                     
 
-            print("\n" + "="*70)
-            print("                  RISK ASSESSMENT (Per Device)")
-            print("="*70)
-
-            print("\n[+] Active Hosts with Risk Level:")
-            for host in self.findings.get('active_hosts', []):
-                ip = host.get('ip', host) if isinstance(host, dict) else str(host)
-                risk_level, risk_score, ports = self.get_device_risk(ip, self.findings)
-
-                port_str = str(ports) if ports else "None"
-                print(f"  - {ip:18} | Risk: {risk_level:8} | Score: {risk_score:2} | Open Ports: {port_str}")
-
-            print("\n" + "="*70)
             return self.findings
         except Exception as e:
             iot_logger.critical(f"[CRITICAL] An error occurred during the IoT scan: {e}")
             raise
 
 
-    def get_device_risk(self, host_ip, findings):
-        """Calculate risk score for individual device"""
+    def calculate_risk_score(self, findings):
+        """Calculate overall risk score for the scan"""
         score = 0
         risk_level = "Low"
-        open_ports = []
         
-        # Find open ports for this host
-        for entry in findings.get('open_ports', []):
-            if isinstance(entry, dict) and entry.get('host') == host_ip:
-                ports = entry.get('ports', [])
-                for p in ports:
-                    port = p.get('port') if isinstance(p, dict) else p
-                    open_ports.append(port)
-                    if port in [23, 21, 161, 554, 2323]:   # High risk ports
-                        score += 3
-                    elif port in [22, 80, 443, 1883, 8080]:  # Medium risk
-                        score += 1
+        open_ports = findings.get('open_ports', [])
+        vulnerable_creds = findings.get('vulnerable_creds', [])
         
-        # Check if this host has vulnerable credentials
-        for cred in findings.get('vulnerable_creds', []):
-            if isinstance(cred, dict) and cred.get('host') == host_ip:
-                score += 5
+        # Count high-risk ports
+        high_risk_ports = 0
+        for entry in open_ports:
+            ports = entry.get('ports', []) if isinstance(entry, dict) else []
+            for p in ports:
+                port_num = p.get('port') if isinstance(p, dict) else p
+                if port_num in [23, 21, 161, 554, 2323]:   # Telnet, FTP, SNMP, RTSP
+                    high_risk_ports += 1
+                    score += 3
+                elif port_num in [22, 80, 443, 1883]:      # SSH, HTTP, MQTT
+                    score += 1
+        
+        # Add points for default credentials found
+        score += len(vulnerable_creds) * 4
         
         # Determine risk level
-        if score >= 8 or any(p in [23, 21] for p in open_ports):
+        if score >= 10 or len(vulnerable_creds) > 0 or high_risk_ports > 0:
             risk_level = "High"
-        elif score >= 4 or len(open_ports) > 0:
+        elif score >= 5:
             risk_level = "Medium"
+        else:
+            risk_level = "Low"
         
-        return risk_level, score, open_ports
+def calculate_risk_score(self, findings):
+        """Calculate overall risk score for the scan"""
+        score = 0
+        risk_level = "Low"
+        
+        open_ports = findings.get('open_ports', [])
+        vulnerable_creds = findings.get('vulnerable_creds', [])
+        
+        # Count high-risk ports
+        high_risk_ports = 0
+        for entry in open_ports:
+            ports = entry.get('ports', []) if isinstance(entry, dict) else []
+            for p in ports:
+                port_num = p.get('port') if isinstance(p, dict) else p
+                if port_num in [23, 21, 161, 554, 2323]:   # Telnet, FTP, SNMP, RTSP
+                    high_risk_ports += 1
+                    score += 3
+                elif port_num in [22, 80, 443, 1883]:      # SSH, HTTP, MQTT
+                    score += 1
+        
+        # Add points for default credentials found
+
